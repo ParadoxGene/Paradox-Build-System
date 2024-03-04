@@ -7,9 +7,9 @@ function(paradox_add_unity_testing_lib version)
             Unity
             GIT_REPOSITORY "https://github.com/ThrowTheSwitch/Unity.git"
             GIT_TAG "${version}"
-            SOURCE_DIR "${PROJECT_DIR}/modules/Unity")
+            SOURCE_DIR "${PROJECT_DIR}/build/modules/Unity")
         FetchContent_Populate(Unity)
-        add_subdirectory("${PROJECT_DIR}/modules/Unity" "${CMAKE_BINARY_DIR}/../../unit-tests/unity/")
+        add_subdirectory("${PROJECT_DIR}/build/modules/Unity" "${CMAKE_BINARY_DIR}/../../unit-tests/unity/")
     endif()
 endfunction()
 
