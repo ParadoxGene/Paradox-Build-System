@@ -44,8 +44,8 @@ elseif(PARADOX_DEBUG)
     set(PARADOX_CXX_COMPILE_FLAGS ${PARADOX_CXX_COMPILE_FLAGS} ${PARADOX_CXX_DEBUG_FLAGS})
 endif()
 
-include("tests/googletest.cmake")
-include("tests/unity.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/tests/googletest.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/tests/unity.cmake")
 
 function(paradox_add_library libname libprefix)
     option(${libprefix}_BUILD_C_LIB "Build the static|shared ${libname} c library" ON)
