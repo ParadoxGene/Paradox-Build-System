@@ -51,13 +51,28 @@ endif()
 include("${CMAKE_CURRENT_LIST_DIR}/tests/googletest.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/tests/unity.cmake")
 
+# Standard options
+function(paradox_library_options libname libprefix)
+    option(${libprefix}_BUILD_LIBS "Build the ${libname} libraries" ON)
+    option(${libprefix}_BUILD_C_LIB "Build the ${libname} static|shared ${libname} c library" ON)
+    option(${libprefix}_BUILD_CXX_LIB "Build the ${libname} static|shared ${libname} cpp library" ON)
+endfunction()
+
+function(paradox_tests_options libprefix)
+    option(PARADOX_PLATFORM_BUILD_TESTS "Build the ${libname} test cases" OFF)
+endfunction()
+
+function(paradox_documentation_options libprefix)
+    option(PARADOX_PLATFORM_BUILD_DOCS "Build the ${libname} documentation" OFF)
+endfunction()
+# ----------------
+
 function(paradox_add_library libname libprefix)
-    option(${libprefix}_BUILD_C_LIB "Build the static|shared ${libname} c library" ON)
+    set(${libprefix}_BUILD_LIBS ON)
     if(${libprefix}_BUILD_C_LIB)
         paradox_c_library(${libname} ${libprefix})
     endif()
 
-    option(${libprefix}_BUILD_CXX_LIB "Build the static|shared ${libname} cpp library" ON)
     if(${libprefix}_BUILD_CXX_LIB)
         paradox_cxx_library(${libname} ${libprefix})
     endif()
@@ -98,6 +113,7 @@ function(paradox_cxx_library libname libprefix)
 endfunction()
 
 function(paradox_add_tests libname libprefix linklibs)
+    set(${libprefix}_BUILD_TESTS ON)
     if(${libprefix}_BUILD_TESTS AND PARADOX_LANGUAGE STREQUAL "c")
         get_property(${libprefix}_C_TESTS_EXISTS GLOBAL PROPERTY ${libprefix}_C_TESTS_EXISTS_PROPERTY)
         if(NOT ${libprefix}_C_TESTS_EXISTS)
