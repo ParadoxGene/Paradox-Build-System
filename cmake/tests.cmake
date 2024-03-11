@@ -16,6 +16,8 @@ macro(paradox_add_tests lib_prefix lib_name)
                 add_executable(${lib_name}-unit-tests ${${lib_prefix}_TESTS_${PARADOX_BUILD_LANG}_SRC})
                 set_target_properties(${lib_name}-unit-tests PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/../../${lib_name}-unit-tests/$<CONFIG>")
                 target_include_directories(${lib_name}-unit-tests PRIVATE ${${lib_prefix}_${PARADOX_BUILD_LANG}_INC})
+                
+                paradox_append_link_lib(${lib_prefix} ${lib_name})
                 target_link_directories(${lib_name}-unit-tests PRIVATE ${CMAKE_LIBRARY_OUTPUT_DIRECTORY} ${CMAKE_ARCHIVE_OUTPUT_DIRECTORY})
                 target_link_libraries(${lib_name}-unit-tests PRIVATE ${lib_name} ${${lib_prefix}_${PARADOX_BUILD_LANG}_LINK_LIBS})
                 target_link_options(${lib_name}-unit-tests PRIVATE ${${lib_prefix}_${PARADOX_BUILD_LANG}_LINK_OPTIONS})
@@ -32,18 +34,15 @@ macro(paradox_add_tests lib_prefix lib_name)
 endmacro()
 
 macro(paradox_add_tests_resources lib_prefix lib_name)
-    string(REPLACE " " ";" ${lib_name}_${PARADOX_BUILD_LANG}_shared_libs ${lib_prefix}_${PARADOX_BUILD_LANG}_SHARED_LIBS)
-    foreach(${lib_name}_${PARADOX_BUILD_LANG}_shared_lib ${${lib_name}_${PARADOX_BUILD_LANG}_shared_libs})
-        paradox_set_shared_lib_name(${lib_name}_${PARADOX_BUILD_LANG}_shared_lib)
-        get_property(${lib_name}_${PARADOX_BUILD_LANG}_shared_lib GLOBAL PROPERTY ${lib_name}_${PARADOX_BUILD_LANG}_shared_lib_property)
-        set(${lib_name}_${PARADOX_BUILD_LANG}_shared_lib_copy_command
-            COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_BINARY_DIR}/../../paradox-shared/$<CONFIG>/${${lib_name}_${PARADOX_BUILD_LANG}_shared_lib}" "$<TARGET_FILE_DIR:${lib_name}-unit-tests>/${${lib_name}_${PARADOX_BUILD_LANG}_shared_lib}"
-            ${${lib_name}_${PARADOX_BUILD_LANG}_shared_lib_copy_command})
+    foreach(lib ${${lib_prefix}_${PARADOX_BUILD_LANG}_SHARED_LIBS})
+        paradox_set_shared_lib_name(lib)
+        list(APPEND ${lib_prefix}_${PARADOX_BUILD_LANG}_COPY_SHARED_LIBS_COMMAND
+            COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_BINARY_DIR}/../../paradox-shared/$<CONFIG>/${lib}" "$<TARGET_FILE_DIR:${lib_name}-unit-tests>/${lib}")
     endforeach()
 
     if(WIN32)
         add_custom_command(TARGET ${lib_name}-unit-tests POST_BUILD 
-            ${${lib_name}_${PARADOX_BUILD_LANG}_shared_lib_copy_command}
+            ${${lib_prefix}_${PARADOX_BUILD_LANG}_COPY_SHARED_LIBS_COMMAND}
             COMMENT "Copying shared libraries to ${lib_name} bin folder")
     endif()
 endmacro()
